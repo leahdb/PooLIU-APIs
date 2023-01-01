@@ -22,6 +22,8 @@ class User extends Authenticatable
         'first_name',
         'last_name',
         'email',
+        'verification_num',
+        'verification_status',
         'password',
         'phone_num',
         'profile_pic',
@@ -52,4 +54,5 @@ class User extends Authenticatable
     // public function posts(){
     //     return $this->has
     // }
+    
 }
