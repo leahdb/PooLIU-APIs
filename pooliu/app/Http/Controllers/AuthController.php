@@ -11,10 +11,14 @@ use App\Mail\VerificationCode;
 use App\Models\User;
 use Auth;
 
+use DB;
+use Illuminate\Support\Facades\Hash;
+use App\Mail\ForgotMail;
+
 class AuthController extends Controller
 {
 
-    public function verificationEmail($email, $code){
+    public function VerificationEmail($email, $code){
 
         $data = [
             'subject'=>'Your PooLIU account verification code',
@@ -33,7 +37,7 @@ class AuthController extends Controller
     }
 
 
-    public function register(Request $request){
+    public function Register(Request $request){
         $this->validate($request, [
             'LIU_ID' => 'required|numeric',
             'password' => 'required|min:6',
@@ -69,7 +73,7 @@ class AuthController extends Controller
     }
 
 
-    public function verify(Request $request){
+    public function Verify(Request $request){
 
         try{
             $entered_digits = [$request->digit1, $request->digit2, $request->digit3, $request->digit4];
@@ -114,7 +118,7 @@ class AuthController extends Controller
     }
 
 
-    public function login(Request $request){
+    public function Login(Request $request){
         try{
             $data = [
                 'LIU_ID' => $request->LIU_ID,
@@ -143,9 +147,9 @@ class AuthController extends Controller
     		'message' => 'Invalid Email Or Password' 
     	],401);
     } 
+
     
-    
-    public function logout(Request $request){
+    public function Logout(Request $request){
         try{
             Auth::logout();
                 
@@ -162,4 +166,89 @@ class AuthController extends Controller
         }
         
     }
+
+
+    public function ForgotPassword(Request $request){
+    	$liu_id = $request->LIU_ID;
+        $is_liu = $request->is_LIU;
+        $email = $liu_id.'@students.'.(($is_liu) ? 'liu' : 'biu').'.edu.lb';
+
+    	if (User::where('email',$email)->doesntExist()) {
+    		return response([
+    			'message' => 'Invalid LIU ID or wrong email type'
+    		],401);
+    	}
+
+    	// generate Randome Token 
+    	$token = rand(10,100000);
+
+    	try{
+    		DB::table('password_resets')->insert([
+    			'email' => $email,
+    			'token' => $token
+    		]);
+
+    		// Mail Send to User 
+    		Mail::to($email)->send(new ForgotMail($token));
+
+    		return response([
+    			'message' => 'Reset Password Mail send on your email'
+    		],200);
+
+    	}catch(Exception $exception){
+    		return response([
+    			'message' => $exception->getMessage()
+    		],400);
+    	}
+    }
+
+
+    public function ResetPassword(Request $request){
+
+        if($request->password === $request->password_confirmation){
+            $email = $request->email;
+            $token = $request->token;
+            $password = Hash::make($request->password);
+
+            $emailcheck = DB::table('password_resets')->where('email',$email)->first();
+            $pincheck = DB::table('password_resets')->where('token',$token)->first();
+
+            if (!$emailcheck) {
+                return response([
+                    'message' => "Email Not Found"
+                ],401);    	 	 
+            }
+            if (!$pincheck) {
+                return response([
+                    'message' => "Pin Code Invalid"
+                ],401);    	 	 
+            }
+
+            DB::table('users')->where('email',$email)->update(['password' => $password]);
+            DB::table('password_resets')->where('email',$email)->delete();
+
+            return response([
+                'message' => 'Password Change Successfully'
+            ],200);
+        }
+        return response([
+            'message' => "Passwords don't match"
+        ],401); 
+
+    }
+
+
+    public function Edit(Request $request){
+
+        $old_id = $request->old_id;
+        $new_id = $request->new_id;
+
+        DB::table('users')->where('LIU_ID',$old_id)->update(['LIU_ID' => $new_id]);
+
+        return response([
+            'message' => 'ID Changed Successfully'
+        ],200);
+
+    }
+
 }

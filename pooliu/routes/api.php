@@ -18,7 +18,10 @@ use App\Http\Controllers\MailController;
 */
 
 //authentication routes
-Route::post('register', [AuthController::class, 'register']);
-Route::post('verify', [AuthController::class, 'verify']);
-Route::post('login', [AuthController::class, 'login']);
-Route::post('logout', [AuthController::class, 'logout']);
+Route::post('register', [AuthController::class, 'Register']);
+Route::post('verify', [AuthController::class, 'Verify']);
+Route::post('login', [AuthController::class, 'Login']);
+Route::post('logout', [AuthController::class, 'Logout']);
+Route::post('forgotpassword',[AuthController::class, 'ForgotPassword']);
+Route::post('resetpassword',[AuthController::class, 'ResetPassword']);
+Route::post('edit',[AuthController::class, 'Edit']);
