@@ -23,36 +23,21 @@ class ProfileController extends AuthController
             'gender' => 'required|boolean'
         ]);
 
-        try{           
-            $data = [
-                'id' => $request->LIU_ID,
-                'password' => $request->password
-            ];
+        try{      
 
-            if (Auth::attempt($data)) {
+            $first_name = $request->first_name;
+            $last_name = $request->last_name;
+            $phone_num = $request->phone_num;
+            $profile_pic = $request->profile_pic;
+            $gender = $request->gender;
 
-                $token = auth()->user()->createToken('LaravelAuthApp')->accessToken;
-                $user = Auth::user();
-
-                $first_name = $request->first_name;
-                $last_name = $request->last_name;
-                $phone_num = $request->phone_num;
-                $profile_pic = $request->profile_pic;
-                $gender = $request->gender;
-
-                $user->update([
-                    'first_name' => $first_name,
-                    'last_name' => $last_name,
-                    'phone_num' => $phone_num,
-                    'profile_pic' => $profile_pic,
-                    'gender' => $gender,
-                ]);
-            
-                return response([
-                    'message' => 'profile set successfully',
-                    'user' => $user
-                ], 200);
-            }
+            DB::table('users')->where('LIU_ID',$request->LIU_ID)->update([
+                'first_name' => $first_name,
+                'last_name' => $last_name,
+                'phone_num' => $phone_num,
+                'profile_pic' => $profile_pic,
+                'gender' => $gender,
+            ]);
 
         }catch(Exception $exception){
             return response([

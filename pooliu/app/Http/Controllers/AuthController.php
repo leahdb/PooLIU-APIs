@@ -53,7 +53,7 @@ class AuthController extends Controller
             $is_liu = $request->is_LIU;
             $email = $liu_id.'@students.'.(($is_liu) ? 'liu' : 'biu').'.edu.lb';
             $code = random_int(1000, 9999);
-            Cache::put('verification_code', $code, now()->addMinutes(120));
+            Cache::put('verification_code', $code, now()->addMinutes(180));
 
             $user = User::create([
                 'LIU_ID' => $liu_id,
@@ -97,6 +97,9 @@ class AuthController extends Controller
 
                     $user->verification_status = 1; 
                     $user->save();
+
+                    Auth::logout();
+                    Auth::user()->token()->revoke();
             
                     return response([
                         'message' => "Registration Successfull",
