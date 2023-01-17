@@ -63,6 +63,12 @@ return [
             ]) : [],
         ],
 
+        'session' => [
+            'driver' => 'database',
+            'table' => 'sessions',
+            'connection' => null,
+        ],
+
         'pgsql' => [
             'driver' => 'pgsql',
             'url' => env('DATABASE_URL'),

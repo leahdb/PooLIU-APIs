@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use Mail;
-
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Auth\Events\Registered;
 use App\Mail\VerificationCode;
 use App\Models\User;
@@ -17,6 +17,7 @@ use App\Mail\ForgotMail;
 
 class AuthController extends Controller
 {
+    // $user;
 
     public function VerificationEmail($email, $code){
 
@@ -41,6 +42,7 @@ class AuthController extends Controller
         $this->validate($request, [
             'LIU_ID' => 'required|numeric',
             'password' => 'required|min:6',
+            'confirm_password' => 'required|same:password',
             'is_LIU' => 'required|boolean'
         ]);
 
@@ -51,6 +53,7 @@ class AuthController extends Controller
             $is_liu = $request->is_LIU;
             $email = $liu_id.'@students.'.(($is_liu) ? 'liu' : 'biu').'.edu.lb';
             $code = random_int(1000, 9999);
+            Cache::put('verification_code', $code, now()->addMinutes(120));
 
             $user = User::create([
                 'LIU_ID' => $liu_id,
@@ -78,6 +81,7 @@ class AuthController extends Controller
         try{
             $entered_digits = [$request->digit1, $request->digit2, $request->digit3, $request->digit4];
             $entered_code = implode('', $entered_digits);
+            $cachedCode = Cache::get('verification_code');
 
             $data = [
                 'verification_num' => $entered_code,
@@ -87,18 +91,18 @@ class AuthController extends Controller
             if (Auth::attempt($data)) {
                 $token = auth()->user()->createToken('LaravelAuthApp')->accessToken;
                 $user = Auth::user();
+                //$token = auth()->$user->createToken('AuthToken')->accessToken;
 
-                if($entered_code == $user->verification_num){
+                if($entered_code == $user->verification_num && $entered_code == $cachedCode){
 
                     $user->verification_status = 1; 
                     $user->save();
-
-                    Auth::logout();
             
                     return response([
                         'message' => "Registration Successfull",
                         'token' => $token,
-                        'user' => $user
+                        'user' => $user,
+                        'check' => Auth::check()
                     ],200);
 
                 }
@@ -130,10 +134,13 @@ class AuthController extends Controller
                 $token = auth()->user()->createToken('LaravelAuthApp')->accessToken;
                 $user = Auth::user();
 
+                Auth::login($user);
+
                 return response([
                     'message' => "Successfully Login",
                     'token' => $token,
-                    'user' => $user
+                    'user' => $user,
+                    'check' => Auth::check()
                 ],200); // States Code
             }
 
@@ -152,6 +159,8 @@ class AuthController extends Controller
     public function Logout(Request $request){
         try{
             Auth::logout();
+
+            //Auth::user()->token()->revoke();
                 
             redirect('/');
 
