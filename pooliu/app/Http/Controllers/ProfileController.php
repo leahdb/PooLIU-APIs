@@ -54,8 +54,7 @@ class ProfileController extends AuthController
         $this->validate($request, [
             'first_name' => 'required',
             'last_name' => 'required',
-            'phone_num' => 'required|numeric',
-            'gender' => 'required|boolean'
+            'phone_num' => 'required|numeric'
         ]);
 
         try{      
@@ -66,16 +65,11 @@ class ProfileController extends AuthController
             //$profile_pic = $request->profile_pic;
             $gender = $request->gender;
 
-            $fileName = time().'.'.$profile_pic->getClientOriginalExtension();
-
-            $profile_pic->storeAs('profiles', $fileName);
-
             DB::table('users')->where('LIU_ID',$request->LIU_ID)->update([
                 'first_name' => $first_name,
                 'last_name' => $last_name,
                 'phone_num' => $phone_num,
                 'profile_pic' => $profile_pic,
-                'gender' => $gender,
             ]);
 
         }catch(Exception $exception){

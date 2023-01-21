@@ -15,7 +15,10 @@ class Trip extends Model
         'location',
         'campus',
         'date',
-        'time'
+        'time',
+        'ride_type',
+        'seats',
+        'is_going'
     ];
 
     public function driver()
@@ -31,5 +34,9 @@ class Trip extends Model
     public function scopeDate($query, $date)
     {
         return $query->whereDate('trips.date', '>=', Carbon::parse($date)->toDateTimeString());
+    }
+
+    public function scopeSearch(){
+        
     }
 }

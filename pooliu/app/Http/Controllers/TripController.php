@@ -7,6 +7,10 @@ use Illuminate\Http\Request;
 use App\Http\Resources\TripResource;
 use App\Http\Resources\TripCollection;
 use App\Http\Requests\StoreTripRequest;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
+use Schema;
+use Carbon\Carbon;
 
 class TripController extends Controller
 {
@@ -15,12 +19,13 @@ class TripController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
             $validator = Validator::make($request->all(), [
                 'per_page' => ['nullable', 'integer'],
                 'location' => 'required',
+                'is_going' => 'required',
                 'campus' => 'required|numeric',
                 'date' => 'required|date|after_or_equal:today',
                 'order_dir' => ['nullable', 'string', Rule::in(['asc', 'desc'])],
@@ -28,30 +33,47 @@ class TripController extends Controller
             ]);
 
             if ($validator->fails()) {
-                return $this->sendError('Validation Error', $validator->errors()->all(), 400);
+                return response([
+                    'message' => $validator->errors()->all()
+                ], 400); 
             }
 
             $query = Trip::query();
 
-            if ($request->filled('search')) {
-                $query->search($request->search);
+            if ($request->filled('location')) {
+                $query->where('location', $request->location);
             }
 
-            return $this->sendResponse(
-                (new TripCollection(
-                    $query->orderBy(
-                        request('order_by', 'id'),
-                        request('order_dir', 'desc')
-                    )->paginate(
-                        request('per_page', 5)
-                    )
-                ))->response()->getData(),
-                'Rides list retrieved successfully'
-            );
-        } catch (Exception $ex) {
-            report($ex);
+            if ($request->filled('is_going')) {
+                $query->where('is_going', $request->is_going);
+            }
 
-            return $this->sendError('Retrival Failed', ['Something went wrong'], 500);
+            if ($request->filled('campus')) {
+                $query->where('campus', $request->campus);
+            }
+
+            if ($request->filled('date')) {
+                $query->whereDate('date', '=', Carbon::parse($request->date)->toDateString());
+            }
+
+            $rides = (new TripCollection(
+                $query->orderBy(
+                    request('order_by', 'id'),
+                    request('order_dir', 'desc')
+                )->paginate(
+                    request('per_page', 5)
+                )
+                ))->response()->getData();
+
+            return response([
+                'message' => "rides retrieved successfully",
+                'rides' => $rides
+            ],200);
+
+        } catch (Exception $exception) {
+            return response([
+                'message' => $exception->getMessage()
+            ], 400);
         }
         //return TripResource::collection(Trip::all());
     }
@@ -72,7 +94,7 @@ class TripController extends Controller
                 'is_going' => 'required',
                 'campus' => 'required|numeric',
                 'date' => 'required|date',
-                'time' => 'required|date_format:H:i',
+                'time' => 'required',
                 'ride_type' => 'required',
                 'seats' => 'required|numeric',
             ]);

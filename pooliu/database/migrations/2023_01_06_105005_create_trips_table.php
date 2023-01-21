@@ -21,7 +21,7 @@ return new class extends Migration
             $table->enum('campus', ['1', '2', '3', '4', '5', '6', '7', '8', '9']); 
             $table->date('date');
             $table->time('time');
-            $table->enum('ride_type', ['1', '2', '3']); 
+            $table->string('ride_type'); 
             $table->integer('seats');
             $table->boolean('is_going');
             $table->timestamps();

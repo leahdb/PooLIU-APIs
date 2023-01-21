@@ -27,8 +27,8 @@ class StoreTripRequest extends FormRequest
             'location' => 'required',
             'is_going' => 'required|boolean',
             'campus' => 'required|numeric',
-            'time' => 'required|date',
-            'ride_type' => 'required|boolean',
+            'date' => 'required|date',
+            'ride_type' => 'required',
             'seats' => 'required|numeric'
         ];
     }
