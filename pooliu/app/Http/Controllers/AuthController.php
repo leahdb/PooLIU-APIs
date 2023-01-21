@@ -17,7 +17,6 @@ use App\Mail\ForgotMail;
 
 class AuthController extends Controller
 {
-    // $user;
 
     public function VerificationEmail($email, $code){
 
@@ -81,7 +80,6 @@ class AuthController extends Controller
         try{
             $entered_digits = [$request->digit1, $request->digit2, $request->digit3, $request->digit4];
             $entered_code = implode('', $entered_digits);
-            $cachedCode = Cache::get('verification_code');
 
             $data = [
                 'verification_num' => $entered_code,
@@ -93,13 +91,12 @@ class AuthController extends Controller
                 $user = Auth::user();
                 //$token = auth()->$user->createToken('AuthToken')->accessToken;
 
-                if($entered_code == $user->verification_num && $entered_code == $cachedCode){
+                if($entered_code == $user->verification_num){
 
                     $user->verification_status = 1; 
                     $user->save();
 
                     Auth::logout();
-                    Auth::user()->token()->revoke();
             
                     return response([
                         'message' => "Registration Successfull",

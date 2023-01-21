@@ -67,19 +67,25 @@ class TripController extends Controller
        try{
 
             $this->validate($request, [
-                'user_id' => 'required',
+                'driver_id' => 'required',
                 'location' => 'required',
+                'is_going' => 'required',
                 'campus' => 'required|numeric',
                 'date' => 'required|date',
                 'time' => 'required|date_format:H:i',
+                'ride_type' => 'required',
+                'seats' => 'required|numeric',
             ]);
 
             $trip = new Trip([
-                'user_id' => $request->get('user_id'),
+                'driver_id' => $request->get('driver_id'),
                 'location' => $request->get('location'),
+                'is_going' => $request->get('is_going'),
                 'campus' => $request->get('campus'),
                 'date' => $request->get('date'),
                 'time' => $request->get('time'),
+                'ride_type' => $request->get('ride_type'),
+                'seats' => $request->get('seats'),
 
             ]);
             $trip->save();

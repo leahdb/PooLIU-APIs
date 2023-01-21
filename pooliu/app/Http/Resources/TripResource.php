@@ -16,15 +16,17 @@ class TripResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'driver_id' => $this->driver_id,
             'location' => $this->location,
-            'time' => $this->time,
+            'is_going' => $this->is_going,
             'campus' => $this->campus,
+            'date' => $this->date,
+            'time' => $this->time,
             'ride_type' => $this->ride_type,
             'seats' => $this->seats,
             'is_going' => $this->is_going,
             'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at
-            
+            'updated_at' => $this->updated_at            
         ];
     }
 }

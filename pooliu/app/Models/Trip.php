@@ -18,9 +18,14 @@ class Trip extends Model
         'time'
     ];
 
-    public function user()
+    public function driver()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(DriverTrip::class);
+    }
+
+    public function passengers()
+    {
+        return $this->belongsToMany(Passenger::class, 'trip_passengers');
     }
 
     public function scopeDate($query, $date)

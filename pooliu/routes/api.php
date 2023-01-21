@@ -31,7 +31,7 @@ Route::post('edit',[AuthController::class, 'Edit']);
 
 Route::post('setup',[ProfileController::class, 'Setup']);
 Route::post('edit',[ProfileController::class, 'Edit']);
-Route::get('show/{user}',[ProfileController::class, 'show']);
+Route::get('show',[ProfileController::class, 'show']);
 Route::apiResource('trips', TripController::class);
 
 

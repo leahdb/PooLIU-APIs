@@ -29,7 +29,9 @@ class User extends Authenticatable
         'profile_pic',
         'is_LIU',
         'gender',
-        'score'
+        'score',
+        'is_driver',
+        'is_rider'
     ];
 
     /**
@@ -54,5 +56,21 @@ class User extends Authenticatable
     // public function posts(){
     //     return $this->has
     // }
+
+    public function driverTrips()
+    {
+        return $this->hasMany(DriverTrip::class);
+    }
+
+    public function riders()
+    {
+        return $this->hasOne(Rider::class);
+    }
+
+
+    public function scopeSearch($query, $liu_id)
+    {
+        return $query->where('LIU_ID', $liu_id);
+    }
     
 }
