@@ -92,7 +92,7 @@ class TripController extends Controller
                 ], 400); 
             }
 
-            $query = Trip::query();
+            $query = Trip::query()->get();
 
             if ($request->filled('user_id')) {
                 $query->where('driver_id', $request->user_id);
@@ -192,6 +192,36 @@ class TripController extends Controller
         return response([
             'message' => "rides retrieved successfully",
             'request' => $riderRequest
+        ],200);
+    }
+
+
+    public function removeRequest(Request $request)
+    {
+    
+        $validator = Validator::make($request->all(), [
+            'id' => 'required|exists:rider_requests,id'
+        ]);
+
+        if ($validator->fails()) {
+            return response([
+                'message' => $validator->errors()->all()
+            ], 400); 
+        }
+
+        $rider_request = Rider_Requests::find(8);
+
+        // Check if the trip exists
+        if (!$rider_request) {
+            return response()->json([
+                'message' => 'rider request not found'
+            ], 404);
+        }
+
+        $rider_request->delete();
+        
+        return response([
+            'message' => "request deleted successfully",
         ],200);
     }
 
