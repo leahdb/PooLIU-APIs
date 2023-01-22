@@ -26,7 +26,7 @@ return new class extends Migration
             $table->binary('profile_pic')->nullable()->default(null);
             $table->boolean('is_LIU');
             $table->boolean('gender')->nullable()->default(null);
-            $table->integer('score')->nullable()->default(null);
+            $table->integer('score')->nullable()->default(5);
             $table->string('password');
             $table->boolean('is_driver')->default(0);
             $table->boolean('is_rider')->default(0);

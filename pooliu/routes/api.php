@@ -33,5 +33,8 @@ Route::post('setup',[ProfileController::class, 'Setup']);
 Route::post('edit',[ProfileController::class, 'Edit']);
 Route::get('show',[ProfileController::class, 'show']);
 Route::apiResource('trips', TripController::class);
+Route::post('trips/{id}/request', [TripController::class, 'requestTrip']);
+Route::get('my-trips', [TripController::class, 'allTrips']);
+Route::get('my-rides', [TripController::class, 'allRides']);
 
 

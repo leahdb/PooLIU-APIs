@@ -10,11 +10,18 @@ class Rider_Requests extends Model
     use HasFactory;
 
     protected $table = 'rider_requests';
+
+    protected $fillable = [
+        'rider_id', 
+        'trip_id', 
+        'status'
+    ];
+
     public $timestamps = true;
 
     public function rider()
     {
-        return $this->belongsTo(Rider::class);
+        return $this->belongsTo(User::class);
     }
 
     public function trip()

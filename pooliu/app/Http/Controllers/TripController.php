@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Trip;
+use App\Models\Rider_Requests;
 use Illuminate\Http\Request;
 use App\Http\Resources\TripResource;
 use App\Http\Resources\TripCollection;
@@ -57,7 +58,7 @@ class TripController extends Controller
             }
 
             $rides = (new TripCollection(
-                $query->orderBy(
+                $query->with('driver')->orderBy(
                     request('order_by', 'id'),
                     request('order_dir', 'desc')
                 )->paginate(
@@ -68,6 +69,40 @@ class TripController extends Controller
             return response([
                 'message' => "rides retrieved successfully",
                 'rides' => $rides
+            ],200);
+
+        } catch (Exception $exception) {
+            return response([
+                'message' => $exception->getMessage()
+            ], 400);
+        }
+        //return TripResource::collection(Trip::all());
+    }
+
+    public function allTrips(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'user_id' => 'required'
+            ]);
+
+            if ($validator->fails()) {
+                return response([
+                    'message' => $validator->errors()->all()
+                ], 400); 
+            }
+
+            $query = Trip::query();
+
+            if ($request->filled('user_id')) {
+                $query->where('driver_id', $request->user_id);
+            }
+
+            $trips = (new TripCollection($query))->response()->getData();
+
+            return response([
+                'message' => "my trips retrieved successfully",
+                'trips' => $trips
             ],200);
 
         } catch (Exception $exception) {
@@ -120,6 +155,44 @@ class TripController extends Controller
             ], 400);
         }
         
+    }
+
+
+    public function requestTrip(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'rider_id' => 'required|exists:users,id'
+        ]);
+
+        if ($validator->fails()) {
+            return response([
+                'message' => $validator->errors()->all()
+            ], 400); 
+        }
+
+        $trip = Trip::find($id);
+
+        // Check if the trip exists
+        if (!$trip) {
+            return response()->json([
+                'message' => 'Trip not found'
+            ], 404);
+        }
+
+        // Create a new passenger request
+        $riderRequest = new Rider_Requests([
+            'rider_id' => $request->rider_id,
+            'trip_id' => $trip->id,
+            'status' => 'pending'
+        ]);
+
+        // Save the request
+        $riderRequest->save();
+
+        return response([
+            'message' => "rides retrieved successfully",
+            'request' => $riderRequest
+        ],200);
     }
 
     /**

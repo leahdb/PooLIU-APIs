@@ -21,9 +21,14 @@ class Trip extends Model
         'is_going'
     ];
 
+    // public function driver()
+    // {
+    //     return $this->belongsTo(DriverTrip::class);
+    // }
+
     public function driver()
     {
-        return $this->belongsTo(DriverTrip::class);
+        return $this->belongsTo(User::class, 'driver_id');
     }
 
     public function passengers()
@@ -31,12 +36,4 @@ class Trip extends Model
         return $this->belongsToMany(Passenger::class, 'trip_passengers');
     }
 
-    public function scopeDate($query, $date)
-    {
-        return $query->whereDate('trips.date', '>=', Carbon::parse($date)->toDateTimeString());
-    }
-
-    public function scopeSearch(){
-        
-    }
 }

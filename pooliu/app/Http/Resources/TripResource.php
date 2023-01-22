@@ -17,6 +17,8 @@ class TripResource extends JsonResource
         return [
             'id' => $this->id,
             'driver_id' => $this->driver_id,
+            'driver_name' => $this->driver->first_name." ".$this->driver->last_name,
+            'driver_score' => $this->driver->score,
             'location' => $this->location,
             'is_going' => $this->is_going,
             'campus' => $this->campus,

@@ -17,7 +17,8 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('rider_id');
             $table->unsignedBigInteger('trip_id');
-            $table->foreign('rider_id')->references('id')->on('riders')->onDelete('cascade');
+            $table->enum('status', ['pending', 'accepted', 'declined']);
+            $table->foreign('rider_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('trip_id')->references('id')->on('trips')->onDelete('cascade');
             $table->timestamps();
         });
